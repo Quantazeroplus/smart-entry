@@ -1,0 +1,302 @@
+.input-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+.input-field {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: transparent;
+  outline: none;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  z-index: 10;
+  position: relative;
+}
+.dark .input-field {
+  border-color: #374151;
+  color: white;
+}
+.input-field:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+.input-label {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  color: #94a3b8;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  z-index: 20;
+}
+.input-field:focus + .input-label,
+.input-field:not(:placeholder-shown) + .input-label {
+  top: -10px;
+  left: 12px;
+  font-size: 0.75rem;
+  background: white;
+  padding: 0 6px;
+  color: #4f46e5;
+  font-weight: 600;
+}
+.dark .input-field:focus + .input-label,
+.dark .input-field:not(:placeholder-shown) + .input-label {
+  background: #111827;
+  color: #818cf8;
+}
+.force-float {
+  top: -10px !important;
+  left: 12px !important;
+  font-size: 0.75rem !important;
+  padding: 0 6px !important;
+  font-weight: 600 !important;
+  z-index: 20 !important;
+}
+.dark .force-float {
+  background: #111827 !important;
+  color: #818cf8 !important;
+}
+#map {
+  filter: grayscale(0.2) contrast(1.1);
+  border-radius: 16px;
+  height: 180px;
+}
+.dark #map {
+  filter: invert(1) hue-rotate(180deg) brightness(0.8);
+}
+.dist-gauge {
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* --- NEW GECWC BUTTON LOADER --- */
+.loader {
+  --main-size: 4em; /* Shrunk from 4em to fit in button */
+  --text-color: #ffffff;
+  --shine-color: #ffffff40;
+  --shadow-color: #cbd5e1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  user-select: none;
+  position: relative;
+  font-size: var(--main-size);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--text-color);
+  width: 7.3em;
+  height: 1.5em;
+  filter: drop-shadow(0 0 0.05em var(--shine-color));
+}
+
+.loader .text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  position: absolute;
+}
+
+.loader .text:nth-child(1) {
+  clip-path: polygon(0% 0%, 11.11% 0%, 11.11% 100%, 0% 100%);
+  font-size: calc(var(--main-size) / 20);
+  margin-left: -2.1em;
+  opacity: 0.6;
+}
+.loader .text:nth-child(2) {
+  clip-path: polygon(11.11% 0%, 22.22% 0%, 22.22% 100%, 11.11% 100%);
+  font-size: calc(var(--main-size) / 16);
+  margin-left: -0.98em;
+  opacity: 0.7;
+}
+.loader .text:nth-child(3) {
+  clip-path: polygon(22.22% 0%, 33.33% 0%, 33.33% 100%, 22.22% 100%);
+  font-size: calc(var(--main-size) / 13);
+  margin-left: -0.33em;
+  opacity: 0.8;
+}
+.loader .text:nth-child(4) {
+  clip-path: polygon(33.33% 0%, 44.44% 0%, 44.44% 100%, 33.33% 100%);
+  font-size: calc(var(--main-size) / 11);
+  margin-left: -0.05em;
+  opacity: 0.9;
+}
+.loader .text:nth-child(5) {
+  clip-path: polygon(44.44% 0%, 55.55% 0%, 55.55% 100%, 44.44% 100%);
+  font-size: calc(var(--main-size) / 10);
+  margin-left: 0em;
+  opacity: 1;
+}
+.loader .text:nth-child(6) {
+  clip-path: polygon(55.55% 0%, 66.66% 0%, 66.66% 100%, 55.55% 100%);
+  font-size: calc(var(--main-size) / 11);
+  margin-left: 0.05em;
+  opacity: 0.9;
+}
+.loader .text:nth-child(7) {
+  clip-path: polygon(66.66% 0%, 77.77% 0%, 77.77% 100%, 66.66% 100%);
+  font-size: calc(var(--main-size) / 13);
+  margin-left: 0.33em;
+  opacity: 0.8;
+}
+.loader .text:nth-child(8) {
+  clip-path: polygon(77.77% 0%, 88.88% 0%, 88.88% 100%, 77.77% 100%);
+  font-size: calc(var(--main-size) / 16);
+  margin-left: 0.98em;
+  opacity: 0.7;
+}
+.loader .text:nth-child(9) {
+  clip-path: polygon(88.88% 0%, 100% 0%, 100% 100%, 88.88% 100%);
+  font-size: calc(var(--main-size) / 20);
+  margin-left: 2.1em;
+  opacity: 0.6;
+}
+
+.loader .text span {
+  animation:
+    scrolling 2s cubic-bezier(0.1, 0.6, 0.9, 0.4) infinite,
+    shadow 2s cubic-bezier(0.1, 0.6, 0.9, 0.4) infinite;
+}
+
+.loader .text:nth-child(1) span {
+  background: linear-gradient(
+    to right,
+    var(--text-color) 4%,
+    var(--shadow-color) 7%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+}
+.loader .text:nth-child(2) span {
+  background: linear-gradient(
+    to right,
+    var(--text-color) 9%,
+    var(--shadow-color) 13%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+}
+.loader .text:nth-child(3) span {
+  background: linear-gradient(
+    to right,
+    var(--text-color) 15%,
+    var(--shadow-color) 18%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+}
+.loader .text:nth-child(4) span {
+  background: linear-gradient(
+    to right,
+    var(--text-color) 20%,
+    var(--shadow-color) 23%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+}
+.loader .text:nth-child(6) span {
+  background: linear-gradient(
+    to right,
+    var(--shadow-color) 29%,
+    var(--text-color) 32%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+}
+.loader .text:nth-child(7) span {
+  background: linear-gradient(
+    to right,
+    var(--shadow-color) 34%,
+    var(--text-color) 37%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+}
+.loader .text:nth-child(8) span {
+  background: linear-gradient(
+    to right,
+    var(--shadow-color) 39%,
+    var(--text-color) 42%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+}
+.loader .text:nth-child(9) span {
+  background: linear-gradient(
+    to right,
+    var(--shadow-color) 45%,
+    var(--text-color) 48%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+}
+
+.loader .line {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  height: 0.05em;
+  width: calc(var(--main-size) / 2);
+  margin-top: 1.2em;
+  border-radius: 0.05em;
+}
+.loader .line::before {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: var(--text-color);
+  opacity: 0.3;
+}
+.loader .line::after {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: var(--text-color);
+  border-radius: 0.05em;
+  transform: translateX(-90%);
+  animation: wobble 2s cubic-bezier(0.5, 0.8, 0.5, 0.2) infinite;
+}
+
+@keyframes wobble {
+  0% {
+    transform: translateX(-90%);
+  }
+  50% {
+    transform: translateX(90%);
+  }
+  100% {
+    transform: translateX(-90%);
+  }
+}
+@keyframes scrolling {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+@keyframes shadow {
+  0% {
+    background-position: -98% 0;
+  }
+  100% {
+    background-position: 102% 0;
+  }
+}
