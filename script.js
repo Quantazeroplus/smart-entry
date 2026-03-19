@@ -1,5 +1,29 @@
-const SCRIPT_URL =
-  "__SCRIPT_URL__";
+document.addEventListener("contextmenu", (event) => event.preventDefault());
+
+document.onkeydown = function (e) {
+  // Block F12 (Dev Tools)
+  if (e.keyCode == 123) {
+    return false;
+  }
+
+  if (e.ctrlKey && e.shiftKey && e.keyCode == "I".charCodeAt(0)) {
+    return false;
+  }
+
+  if (e.ctrlKey && e.shiftKey && e.keyCode == "J".charCodeAt(0)) {
+    return false;
+  }
+
+  if (e.ctrlKey && e.keyCode == "U".charCodeAt(0)) {
+    return false;
+  }
+
+  if (e.ctrlKey && e.shiftKey && e.keyCode == "C".charCodeAt(0)) {
+    return false;
+  }
+};
+
+const SCRIPT_URL = "__SCRIPT_URL__";
 const QR_COORDS = { lat: __QR_LAT__, lng: __QR_LON__ };
 const MAX_DIST = __MAX_DIST__;
 
