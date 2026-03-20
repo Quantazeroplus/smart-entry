@@ -27,7 +27,7 @@ const SCRIPT_URL = "__SCRIPT_URL__";
 const QR_COORDS = { lat: __QR_LAT__, lng: __QR_LON__ };
 const MAX_DIST = __MAX_DIST__;
 
-const ENTRY_OPTIONS = ["Lecture", "Library", "Office", "Other"];
+const ENTRY_OPTIONS = ["Lecture", "Library","Hostel", "Office", "Other"];
 const EXIT_OPTIONS = ["Chowk", "Bettiah", "Home", "Other"];
 
 //  DEVICE ID ---
