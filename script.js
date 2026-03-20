@@ -1,7 +1,7 @@
 document.addEventListener("contextmenu", (event) => event.preventDefault());
 
 document.onkeydown = function (e) {
-  // Block F12 (Dev Tools)
+ 
   if (e.keyCode == 123) {
     return false;
   }
