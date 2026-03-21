@@ -4,8 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Campus Smart Entry</title>
-    <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#4f46e5" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -229,6 +227,34 @@
                 </label>
               </div>
 
+              <div
+                class="relative flex p-1 bg-slate-200/50 dark:bg-slate-800/50 backdrop-blur-md rounded-2xl mb-4 z-10 border border-slate-300/30 dark:border-white/5"
+              >
+                <div
+                  id="roleGlider"
+                  class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-white dark:bg-slate-700 rounded-xl shadow-md transition-all duration-300 ease-out z-0"
+                ></div>
+
+                <button
+                  type="button"
+                  id="tabStudent"
+                  onclick="toggleRole('Student')"
+                  class="relative flex-1 py-2.5 z-10 text-sm font-bold transition-colors duration-300 flex items-center justify-center gap-2 text-indigo-600 dark:text-indigo-400"
+                >
+                  <i class="fas fa-user-graduate"></i> Student
+                </button>
+                <button
+                  type="button"
+                  id="tabGuest"
+                  onclick="toggleRole('Guest')"
+                  class="relative flex-1 py-2.5 z-10 text-sm font-bold transition-colors duration-300 flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                >
+                  <i class="fas fa-user-tie"></i> Visitor / Guest
+                </button>
+              </div>
+
+              <input type="hidden" id="userRole" value="Student" />
+
               <div class="input-group !mb-0 mt-2">
                 <input
                   type="text"
@@ -260,16 +286,21 @@
                     />
                     <label for="name" class="input-label">Full Name</label>
                   </div>
-                  <div class="input-group !mb-0 flex gap-3 h-[52px]">
+                  <div
+                    class="input-group !mb-0 flex gap-3 h-[52px]"
+                    id="genderGroup"
+                  >
                     <label class="flex-1 relative cursor-pointer h-full">
                       <input
                         type="radio"
                         name="gender"
+                        id="genderInput1"
                         value="Boy"
                         class="peer sr-only"
                         required
                       />
                       <div
+                        id="genderLabel1"
                         class="w-full h-full flex items-center justify-center rounded-xl border-2 border-slate-200 dark:border-slate-700 font-bold text-slate-500 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 dark:peer-checked:bg-indigo-900/30 dark:peer-checked:border-indigo-400 dark:peer-checked:text-indigo-400 transition-all shadow-sm"
                       >
                         👦 Boy
@@ -279,11 +310,13 @@
                       <input
                         type="radio"
                         name="gender"
+                        id="genderInput2"
                         value="Girl"
                         class="peer sr-only"
                         required
                       />
                       <div
+                        id="genderLabel2"
                         class="w-full h-full flex items-center justify-center rounded-xl border-2 border-slate-200 dark:border-slate-700 font-bold text-slate-500 peer-checked:border-rose-500 peer-checked:bg-rose-50 peer-checked:text-rose-600 dark:peer-checked:bg-rose-900/30 dark:peer-checked:border-rose-400 dark:peer-checked:text-rose-400 transition-all shadow-sm"
                       >
                         👧 Girl
@@ -330,7 +363,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div class="input-group !mb-0">
+                  <div class="input-group !mb-0" id="mobileGroup">
                     <input
                       type="tel"
                       id="mobile"
@@ -347,7 +380,8 @@
                       >Mobile Number</label
                     >
                   </div>
-                  <div class="input-group !mb-0">
+
+                  <div class="input-group !mb-0" id="addressGroup">
                     <input
                       type="text"
                       id="address"
@@ -363,12 +397,83 @@
                   </div>
                 </div>
 
-                <div class="input-group !mb-0">
+                <div
+                  id="guestFields"
+                  class="hidden flex-col gap-4 mt-2 border-t border-slate-200 dark:border-slate-800 pt-4"
+                >
+                  <label
+                    class="text-sm font-bold text-slate-500 dark:text-slate-400 block"
+                    >Do you have a vehicle?</label
+                  >
+                  <div class="flex gap-3 h-[45px] mb-2">
+                    <label class="flex-1 relative cursor-pointer h-full">
+                      <input
+                        type="radio"
+                        name="hasVehicle"
+                        value="Yes"
+                        onchange="toggleVehicle(true)"
+                        class="peer sr-only"
+                      />
+                      <div
+                        class="w-full h-full flex items-center justify-center rounded-xl border-2 border-slate-200 dark:border-slate-700 font-bold text-slate-500 peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-600 dark:peer-checked:bg-amber-900/30 transition-all shadow-sm"
+                      >
+                        Yes
+                      </div>
+                    </label>
+                    <label class="flex-1 relative cursor-pointer h-full">
+                      <input
+                        type="radio"
+                        name="hasVehicle"
+                        value="No"
+                        onchange="toggleVehicle(false)"
+                        class="peer sr-only"
+                        checked
+                      />
+                      <div
+                        class="w-full h-full flex items-center justify-center rounded-xl border-2 border-slate-200 dark:border-slate-700 font-bold text-slate-500 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-600 dark:peer-checked:bg-emerald-900/30 transition-all shadow-sm"
+                      >
+                        No
+                      </div>
+                    </label>
+                  </div>
+
+                  <div
+                    id="vehicleInputs"
+                    class="hidden flex-col gap-5 animate-slide-up"
+                  >
+                    <div class="input-group !mb-0">
+                      <input
+                        type="text"
+                        id="vehicleNo"
+                        class="input-field peer font-medium uppercase"
+                        placeholder=" "
+                      />
+                      <label for="vehicleNo" class="input-label"
+                        >Vehicle Number</label
+                      >
+                    </div>
+                    <div class="input-group !mb-0">
+                      <input
+                        type="file"
+                        id="imageUpload"
+                        accept="image/*"
+                        capture="environment"
+                        class="w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all cursor-pointer border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-2"
+                      />
+                      <p class="text-[10px] text-slate-400 mt-1 ml-1">
+                        Upload Picture (Optional)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="input-group !mb-0" id="purposeGroup">
                   <select
                     id="purpose"
                     name="purpose"
                     onchange="toggleOther(this)"
                     class="input-field bg-white dark:bg-darkCard cursor-pointer font-medium"
+                    required
                   ></select>
                   <label id="purposeLabel" class="input-label force-float"
                     >Purpose of Visit</label
@@ -466,7 +571,7 @@
           &copy; 2026 GEC<span class="text-indigo-500 dark:text-indigo-400"
             >WC</span
           >
-          Smart Entry v_2.1
+          v_2.1.1
         </p>
       </div>
     </footer>

@@ -1,7 +1,6 @@
 document.addEventListener("contextmenu", (event) => event.preventDefault());
 
 document.onkeydown = function (e) {
- 
   if (e.keyCode == 123) {
     return false;
   }
@@ -23,11 +22,300 @@ document.onkeydown = function (e) {
   }
 };
 
+let base64ImageString = "";
+
+// Handle Student/Guest Toggle
+function toggleRole(role) {
+  const currentRole = document.getElementById("userRole").value;
+  const glider = document.getElementById("roleGlider");
+
+  if (currentRole !== role) {
+    if (role === "Guest") {
+      glider.style.transform = "translateX(100%)";
+    } else {
+      glider.style.transform = "translateX(0%)";
+    }
+
+    document.getElementById("roll").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("mobile").value = "";
+    document.getElementById("vehicleNo").value = "";
+    document.getElementById("otherPurpose").value = "";
+    if (document.getElementById("imageUpload"))
+      document.getElementById("imageUpload").value = "";
+    base64ImageString = "";
+    document.getElementById("branch").value = "";
+    document.getElementById("roomNo").value = "";
+    document.getElementById("purpose").value = "";
+    if (document.getElementById("genderInput1"))
+      document.getElementById("genderInput1").checked = false;
+    if (document.getElementById("genderInput2"))
+      document.getElementById("genderInput2").checked = false;
+    document.getElementById("otherBox").classList.add("hidden");
+    document.getElementById("quickEntryBox").classList.add("hidden");
+    const quickCheck = document.getElementById("quickEntryCheck");
+    if (quickCheck) {
+      quickCheck.checked = false;
+      toggleQuickEntry(quickCheck);
+    }
+
+    document.querySelectorAll(".input-field").forEach((input) => {
+      input.dispatchEvent(new Event("input"));
+      input.dispatchEvent(new Event("blur"));
+    });
+  }
+
+  document.getElementById("userRole").value = role;
+  updateVisibility();
+}
+
+function setMode(mode) {
+  document.getElementById("actionInput").value = mode;
+  const isEntry = mode === "Entry";
+
+  const entryActiveClass =
+    "flex-1 py-3 rounded-xl font-black text-sm tracking-wide bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_4px_15px_rgba(16,185,129,0.4)] transition-all duration-300 flex items-center justify-center gap-2";
+  const exitActiveClass =
+    "flex-1 py-3 rounded-xl font-black text-sm tracking-wide bg-gradient-to-r from-rose-500 to-red-500 text-white shadow-[0_4px_15px_rgba(244,63,94,0.4)] transition-all duration-300 flex items-center justify-center gap-2";
+  const inactiveClass =
+    "flex-1 py-3 rounded-xl font-bold text-sm tracking-wide text-slate-500 dark:text-slate-400 hover:bg-slate-300/50 dark:hover:bg-white/5 transition-all duration-300 flex items-center justify-center gap-2";
+
+  document.getElementById("btnEntry").className = isEntry
+    ? entryActiveClass
+    : inactiveClass;
+  document.getElementById("btnExit").className = !isEntry
+    ? exitActiveClass
+    : inactiveClass;
+  document.getElementById("btnEntry").innerHTML =
+    `<i class="fas fa-sign-in-alt text-lg ${isEntry ? "" : "opacity-70"}"></i><span>ENTRY</span>`;
+  document.getElementById("btnExit").innerHTML =
+    `<i class="fas fa-sign-out-alt text-lg ${!isEntry ? "" : "opacity-70"}"></i><span>EXIT</span>`;
+
+  updateVisibility();
+
+  const isGuest = document.getElementById("userRole").value === "Guest";
+  const addrField = document.getElementById("address");
+  if (
+    !isGuest &&
+    (addrField.value === "" ||
+      addrField.value === "Home" ||
+      addrField.value === "Hostel")
+  ) {
+    addrField.value = isEntry ? "Home" : "Hostel";
+    addrField.dispatchEvent(new Event("input"));
+  }
+
+  document.getElementById("quickEntryBox").classList.add("hidden");
+  if (document.getElementById("quickEntryCheck")) {
+    document.getElementById("quickEntryCheck").checked = false;
+    toggleQuickEntry(document.getElementById("quickEntryCheck"));
+  }
+
+  const rollInput = document.getElementById("roll");
+  if (rollInput.value) rollInput.dispatchEvent(new Event("blur"));
+}
+
+function updateVisibility() {
+  const isGuest = document.getElementById("userRole").value === "Guest";
+  const isExit = document.getElementById("actionInput").value === "Exit";
+  const hideForGuestExit = isGuest && isExit; // The magic trigger!
+
+  // 1. Style Tabs
+
+  const isGuestNow = document.getElementById("userRole").value === "Guest";
+  document.getElementById("tabStudent").className = isGuestNow
+    ? "relative flex-1 py-2.5 z-10 text-sm font-bold text-slate-500 transition-all duration-300 flex items-center justify-center gap-2"
+    : "relative flex-1 py-2.5 z-10 text-sm font-bold text-indigo-600 dark:text-indigo-400 transition-all duration-300 flex items-center justify-center gap-2";
+
+  document.getElementById("tabGuest").className = isGuestNow
+    ? "relative flex-1 py-2.5 z-10 text-sm font-bold text-indigo-600 dark:text-indigo-400 transition-all duration-300 flex items-center justify-center gap-2"
+    : "relative flex-1 py-2.5 z-10 text-sm font-bold text-slate-500 transition-all duration-300 flex items-center justify-center gap-2";
+
+  // 2. Change Roll Label
+
+  const rollInput = document.getElementById("roll");
+  document.querySelector('label[for="roll"]').innerHTML = isGuest
+    ? '<i class="fas fa-id-card mr-2 opacity-70"></i>ID / Mobile No'
+    : '<i class="fas fa-id-card mr-2 opacity-70"></i>Roll Number';
+
+  if (isGuest) {
+    rollInput.pattern = "[0-9]{10}";
+    rollInput.maxLength = 10;
+    rollInput.title =
+      "A valid 10-digit mobile number is required as a Guest ID.";
+    rollInput.setAttribute(
+      "oninput",
+      "this.value = this.value.replace(/[^0-9]/g, '')",
+    );
+  } else {
+    rollInput.removeAttribute("pattern");
+    rollInput.removeAttribute("title");
+    rollInput.removeAttribute("maxLength");
+    rollInput.removeAttribute("oninput");
+  }
+
+  document.getElementById("genderInput1").value = isGuest ? "Male" : "Boy";
+  document.getElementById("genderLabel1").innerHTML = isGuest
+    ? "👨 Male"
+    : "👦 Boy";
+  document.getElementById("genderInput2").value = isGuest ? "Female" : "Girl";
+  document.getElementById("genderLabel2").innerHTML = isGuest
+    ? "👩 Female"
+    : "👧 Girl";
+
+  const addrField = document.getElementById("address");
+  const addrLabel = document.querySelector('label[for="address"]');
+  if (isGuest) {
+    addrField.value = ""; // Make it empty
+    addrField.placeholder = "Vill., Post.";
+    addrLabel.classList.add("force-float");
+  } else {
+    addrField.placeholder = " ";
+    addrLabel.classList.remove("force-float");
+
+    if (
+      addrField.value === "" ||
+      addrField.value === "Home" ||
+      addrField.value === "Hostel"
+    ) {
+      addrField.value = !isExit ? "Home" : "Hostel";
+    }
+  }
+  addrField.dispatchEvent(new Event("input"));
+
+  // 4. Hide/Show Core Sections
+  document.getElementById("genderGroup").style.display = hideForGuestExit
+    ? "none"
+    : "flex";
+  document.getElementById("addressGroup").style.display = hideForGuestExit
+    ? "none"
+    : "block";
+  document.getElementById("purposeGroup").style.display = hideForGuestExit
+    ? "none"
+    : "block";
+
+  // Guest Vehicles are only for Entry!
+  document
+    .getElementById("guestFields")
+    .classList.toggle("hidden", hideForGuestExit || !isGuest);
+
+  // Branch/Room/Mobile are ALWAYS hidden for Guests
+  document.getElementById("branch").parentElement.style.display = isGuest
+    ? "none"
+    : "block";
+  document.getElementById("roomNo").parentElement.style.display = isGuest
+    ? "none"
+    : "block";
+  document.getElementById("mobileGroup").style.display = isGuest
+    ? "none"
+    : "block";
+
+  document.getElementById("branch").required = !isGuest;
+  document.getElementById("roomNo").required = !isGuest;
+  document.getElementById("mobile").required = !isGuest;
+
+  document.getElementById("genderInput1").required = !hideForGuestExit;
+  document.getElementById("genderInput2").required = !hideForGuestExit;
+  document.getElementById("address").required = !hideForGuestExit;
+  document.getElementById("purpose").required = !hideForGuestExit;
+
+  const select = document.getElementById("purpose");
+  const label = document.getElementById("purposeLabel");
+  label.innerText = !isExit ? "Purpose of Visit" : "Destination";
+  const options = !isExit ? ENTRY_OPTIONS : EXIT_OPTIONS;
+
+  const defaultOption = isGuest
+    ? '<option value="" disabled selected>Select Purpose</option>'
+    : "";
+
+  select.innerHTML =
+    defaultOption +
+    options
+      .map(
+        (opt) =>
+          `<option value="${opt}">${opt === "Other" ? "Other (Write below)" : opt}</option>`,
+      )
+      .join("");
+
+  //  WIPE & HIDE "OTHER" BOX ON TAB SWITCH
+  document.getElementById("otherBox").classList.add("hidden");
+  document.getElementById("otherPurpose").required = false;
+  document.getElementById("otherPurpose").value = "";
+}
+
+function toggleVehicle(hasVehicle) {
+  const vehicleInputs = document.getElementById("vehicleInputs");
+  const vehicleNo = document.getElementById("vehicleNo");
+  if (hasVehicle) {
+    vehicleInputs.classList.remove("hidden");
+    vehicleInputs.classList.add("flex");
+    vehicleNo.required = true;
+  } else {
+    vehicleInputs.classList.add("hidden");
+    vehicleInputs.classList.remove("flex");
+    vehicleNo.required = false;
+    vehicleNo.value = "";
+    document.getElementById("imageUpload").value = "";
+    base64ImageString = "";
+  }
+}
+
+function toggleOther(select) {
+  const box = document.getElementById("otherBox");
+  box.classList.toggle("hidden", select.value !== "Other");
+  document.getElementById("otherPurpose").required = select.value === "Other";
+}
+
+// Handle Vehicle Yes/No Toggle
+function toggleVehicle(hasVehicle) {
+  const vehicleInputs = document.getElementById("vehicleInputs");
+  const vehicleNo = document.getElementById("vehicleNo");
+
+  if (hasVehicle) {
+    vehicleInputs.classList.remove("hidden");
+    vehicleInputs.classList.add("flex");
+    vehicleNo.required = true; // Force them to enter the number if they click Yes
+  } else {
+    vehicleInputs.classList.add("hidden");
+    vehicleInputs.classList.remove("flex");
+    vehicleNo.required = false;
+    vehicleNo.value = "";
+    document.getElementById("imageUpload").value = "";
+    base64ImageString = "";
+  }
+}
+
+// Compress Image using Canvas
+document
+  .getElementById("imageUpload")
+  ?.addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function (e) {
+      const img = new Image();
+      img.src = e.target.result;
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 800;
+        const scaleSize = MAX_WIDTH / img.width;
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scaleSize;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        base64ImageString = canvas.toDataURL("image/jpeg", 0.7); // 70% quality
+      };
+    };
+  });
 const SCRIPT_URL = "__SCRIPT_URL__";
 const QR_COORDS = { lat: __QR_LAT__, lng: __QR_LON__ };
 const MAX_DIST = __MAX_DIST__;
 
-const ENTRY_OPTIONS = ["Lecture", "Library","Hostel", "Office", "Other"];
+const ENTRY_OPTIONS = ["Lecture", "Hostel", "Office", "Other"];
 const EXIT_OPTIONS = ["Chowk", "Bettiah", "Home", "Other"];
 
 //  DEVICE ID ---
@@ -91,11 +379,16 @@ document.getElementById("roll").addEventListener("blur", async (e) => {
 
       if (data.userData.roomNo)
         document.getElementById("roomNo").value = data.userData.roomNo;
+
       if (data.userData.gender) {
         const genderRadio = document.querySelector(
           `input[name="gender"][value="${data.userData.gender}"]`,
         );
         if (genderRadio) genderRadio.checked = true;
+      }
+
+      if (data.userData.role === "Student" || data.userData.role === "Guest") {
+        toggleRole(data.userData.role);
       }
 
       // Trigger floating label fixes
@@ -168,19 +461,29 @@ document.getElementById("entryForm").addEventListener("submit", async (e) => {
         'input[name="gender"]:checked',
       );
 
+      //  CHECK IF GUEST TO FIX MOBILE NUMBER
+      const isGuest = document.getElementById("userRole").value === "Guest";
+
       const payload = {
         action: "submit",
         actionInput: document.getElementById("actionInput").value,
+        role: document.getElementById("userRole").value, // 🚨 FIXED: Now sending the Role!
         roll: document.getElementById("roll").value,
         name: document.getElementById("name").value,
         gender: selectedGender ? selectedGender.value : "Not Specified",
-        branch: document.getElementById("branch").value,
-        roomNo: document.getElementById("roomNo").value,
+        branch: document.getElementById("branch").value || "N/A",
+        roomNo: document.getElementById("roomNo").value || "N/A",
         deviceId: getDeviceId(),
-        mobile: document.getElementById("mobile").value,
-        address: document.getElementById("address").value,
-        purposeMain: document.getElementById("purpose").value,
+        mobile: isGuest
+          ? document.getElementById("roll").value
+          : document.getElementById("mobile").value,
+        address: document.getElementById("address").value || "N/A",
+        purposeMain: document.getElementById("purpose").value || "N/A",
         purposeOther: document.getElementById("otherPurpose").value,
+        vehicleNo: document.getElementById("vehicleNo")
+          ? document.getElementById("vehicleNo").value
+          : "",
+        imageBase64: base64ImageString,
         isQuickEntry: isQuick,
         lat: pos.coords.latitude,
         lon: pos.coords.longitude,
@@ -301,62 +604,19 @@ function updatePurposeOptions(mode) {
   const options = mode === "Entry" ? ENTRY_OPTIONS : EXIT_OPTIONS;
   label.innerText = mode === "Entry" ? "Purpose of Visit" : "Destination";
 
-  select.innerHTML = options
-    .map(
-      (opt) =>
-        `<option value="${opt}">${opt === "Other" ? "Other (Write below)" : opt}</option>`,
-    )
-    .join("");
-}
+  const isGuest = document.getElementById("userRole").value === "Guest";
+  const defaultOption = isGuest
+    ? '<option value="" disabled selected>Select Purpose</option>'
+    : "";
 
-function setMode(mode) {
-  document.getElementById("actionInput").value = mode;
-  const isEntry = mode === "Entry";
-
-  const entryActiveClass =
-    "flex-1 py-3 rounded-xl font-black text-sm tracking-wide bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_4px_15px_rgba(16,185,129,0.4)] transition-all duration-300 flex items-center justify-center gap-2";
-
-  const exitActiveClass =
-    "flex-1 py-3 rounded-xl font-black text-sm tracking-wide bg-gradient-to-r from-rose-500 to-red-500 text-white shadow-[0_4px_15px_rgba(244,63,94,0.4)] transition-all duration-300 flex items-center justify-center gap-2";
-
-  const inactiveClass =
-    "flex-1 py-3 rounded-xl font-bold text-sm tracking-wide text-slate-500 dark:text-slate-400 hover:bg-slate-300/50 dark:hover:bg-white/5 transition-all duration-300 flex items-center justify-center gap-2";
-
-  document.getElementById("btnEntry").className = isEntry
-    ? entryActiveClass
-    : inactiveClass;
-  document.getElementById("btnExit").className = !isEntry
-    ? exitActiveClass
-    : inactiveClass;
-
-  document.getElementById("btnEntry").innerHTML =
-    `<i class="fas fa-sign-in-alt text-lg ${isEntry ? "" : "opacity-70"}"></i><span>ENTRY</span>`;
-  document.getElementById("btnExit").innerHTML =
-    `<i class="fas fa-sign-out-alt text-lg ${!isEntry ? "" : "opacity-70"}"></i><span>EXIT</span>`;
-
-  // ... Keep your address checking logic below this ...
-
-  const addrField = document.getElementById("address");
-  if (
-    addrField.value === "" ||
-    addrField.value === "Home" ||
-    addrField.value === "Hostel"
-  ) {
-    addrField.value = isEntry ? "Home" : "Hostel";
-    addrField.dispatchEvent(new Event("input"));
-  }
-
-  updatePurposeOptions(mode);
-
-  document.getElementById("quickEntryBox").classList.add("hidden");
-  const quickCheck = document.getElementById("quickEntryCheck");
-  if (quickCheck) {
-    quickCheck.checked = false;
-    toggleQuickEntry(quickCheck);
-  }
-
-  const rollInput = document.getElementById("roll");
-  if (rollInput.value) rollInput.dispatchEvent(new Event("blur"));
+  select.innerHTML =
+    defaultOption +
+    options
+      .map(
+        (opt) =>
+          `<option value="${opt}">${opt === "Other" ? "Other (Write below)" : opt}</option>`,
+      )
+      .join("");
 }
 
 // --- MAP & GPS ---
@@ -419,8 +679,6 @@ navigator.geolocation.watchPosition(
       isInZone = true; // Mark as inside
       if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]); // Vibrate ONCE
     } else if (dist > MAX_DIST + 5) {
-      // Only reset if they walk at least 5 meters AWAY from the boundary (30m total)
-      // This prevents GPS jitter from triggering multiple vibrations!
       isInZone = false;
     }
     document.getElementById("lockMessage").style.display = isAllowed
@@ -447,9 +705,9 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
@@ -550,6 +808,13 @@ function closeHistoryModal() {
 function saveToHistory(data) {
   let history = JSON.parse(localStorage.getItem("campus_history") || "[]");
   const now = new Date();
+
+  const todayStr = now.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
   const record = {
     id: Date.now(),
     name: data.name,
@@ -559,26 +824,39 @@ function saveToHistory(data) {
       minute: "2-digit",
       second: "2-digit",
     }),
-    date: now.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }),
+    date: todayStr, // Use the generated string
     timestamp: now.getTime(),
   };
+
   history.unshift(record);
-  const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
-  history = history.filter((item) => item.timestamp > oneDayAgo);
+
+  //  DELETE ANYTHING NOT FROM TODAY
+  history = history.filter((item) => item.date === todayStr);
+
   localStorage.setItem("campus_history", JSON.stringify(history));
   renderHistory();
 }
-
 // --- 2. RENDER HISTORY PILLS ---
 
 function renderHistory() {
   const historyList = document.getElementById("historyList");
   const section = document.getElementById("historySection");
-  const history = JSON.parse(localStorage.getItem("campus_history") || "[]");
+
+  // 🚨 GET TODAY'S DATE STRING
+  const now = new Date();
+  const todayStr = now.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+  let history = JSON.parse(localStorage.getItem("campus_history") || "[]");
+  const originalLength = history.length;
+  history = history.filter((item) => item.date === todayStr);
+
+  if (history.length !== originalLength) {
+    localStorage.setItem("campus_history", JSON.stringify(history));
+  }
 
   if (history.length === 0) {
     section.classList.add("hidden");
@@ -589,8 +867,6 @@ function renderHistory() {
   historyList.innerHTML = history
     .map((item) => {
       const isEntry = item.mode === "Entry";
-
-      // Dynamic Holographic Colors
       const borderGlow = isEntry
         ? "from-emerald-400 via-emerald-200 to-teal-500 dark:from-emerald-500/50 dark:to-teal-500/50"
         : "from-rose-400 via-rose-200 to-red-500 dark:from-rose-500/50 dark:to-red-500/50";
@@ -609,24 +885,17 @@ function renderHistory() {
       const dotColor = isEntry ? "bg-emerald-500" : "bg-rose-500";
 
       return `
-            <div onclick="reShowSuccess('${item.name.replace(/'/g, "\\'")}', '${item.mode}', '${item.time}', '${item.date || "Today"}')" 
+            <div onclick="reShowSuccess('${item.name.replace(/'/g, "\\'")}', '${item.mode}', '${item.time}', '${item.date}')" 
                  class="relative group cursor-pointer rounded-[1.5rem] p-[2px] shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 overflow-hidden">
-                
                 <div class="absolute inset-0 bg-gradient-to-br ${borderGlow} opacity-30 group-hover:opacity-100 transition-opacity duration-500"></div>
-
                 <div class="relative flex items-center justify-between p-4 bg-white/90 dark:bg-[#111827]/95 backdrop-blur-2xl rounded-[1.4rem] h-full w-full border border-white/50 dark:border-white/5">
-                    
                     <div class="absolute -right-10 -top-10 w-32 h-32 ${isEntry ? "bg-emerald-500/10" : "bg-rose-500/10"} blur-[2rem] rounded-full group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
-
                     <div class="flex items-center gap-4 relative z-10">
-                        
                         <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-gradient-to-br ${iconGradient} text-white border border-white/30 transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-500 flex-shrink-0">
                             <i class="fas ${iconClass} text-lg drop-shadow-md"></i>
                         </div>
-                        
                         <div class="flex flex-col justify-center">
                             <span class="font-black text-slate-800 dark:text-white text-[15px] tracking-tight mb-1 truncate max-w-[120px] sm:max-w-[150px]">${item.name}</span>
-                            
                             <div class="flex items-center gap-1.5 w-max px-2 py-0.5 rounded-md border ${pillColors}">
                                 <div class="relative flex h-1.5 w-1.5">
                                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full ${dotColor} opacity-75"></span>
@@ -636,9 +905,8 @@ function renderHistory() {
                             </div>
                         </div>
                     </div>
-
                     <div class="flex flex-col items-end relative z-10">
-                        <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 tracking-[0.2em] uppercase mb-0.5">${item.date || "TODAY"}</span>
+                        <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 tracking-[0.2em] uppercase mb-0.5">${item.date}</span>
                         <span class="text-xl sm:text-2xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-b ${timeGradient} drop-shadow-sm group-hover:scale-110 transition-transform duration-500 origin-right tracking-tighter">${item.time}</span>
                     </div>
                 </div>
@@ -707,7 +975,7 @@ function reShowSuccess(name, mode, time, date) {
 
   document.getElementById("successGreeting").innerText = "Record: " + name;
   document.getElementById("successSubtext").innerText =
-    "This " + mode + " was marked in your local history.";
+    "Your " + mode + " has been successfully recorded in your logs.";
   document.getElementById("displayTime").innerText = time;
   // Uses the passed date, or defaults to "Today" if it's an old record
   document.getElementById("displayDate").innerText = date || "Today";
@@ -735,13 +1003,3 @@ window.addEventListener("DOMContentLoaded", () => {
   updatePurposeOptions("Entry");
   renderHistory();
 });
-
-// --- PWA SERVICE WORKER REGISTRATION ---
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("./sw.js")
-      .then((reg) => console.log("Service Worker Registered!", reg))
-      .catch((err) => console.error("Service Worker Failed!", err));
-  });
-}
