@@ -1,4 +1,4 @@
-const CACHE_NAME = "gecwc-entry-v2";
+const CACHE_NAME = "gecwc-entry-v3";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",

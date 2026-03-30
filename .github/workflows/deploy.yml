@@ -23,23 +23,33 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
-      - name: Inject Secrets into script.js
-        
+      - name: Inject Secrets into Scripts
         run: |
           sed -i "s|__SCRIPT_URL__|${{ secrets.SCRIPT_URL }}|g" script.js
           sed -i "s|__QR_LAT__|${{ secrets.QR_LAT }}|g" script.js
           sed -i "s|__QR_LON__|${{ secrets.QR_LON }}|g" script.js
           sed -i "s|__MAX_DIST__|${{ secrets.MAX_DIST }}|g" script.js
+          sed -i "s|__SCRIPT_URL__|${{ secrets.SCRIPT_URL }}|g" qr_script.js
+          sed -i "s|__GUARD_PASS__|${{ secrets.GUARD_PASS }}|g" qr_script.js
 
       - name: Install JavaScript Obfuscator
         run: npm install -g javascript-obfuscator
 
       - name: Scramble JavaScript
-        # This  codes and arrays
         run: |
+          # Obfuscate main script.js
           javascript-obfuscator script.js --output script.js \
+            --compact true \
+            --control-flow-flattening true \
+            --dead-code-injection true \
+            --string-array true \
+            --string-array-encoding 'base64' \
+            --disable-console-output true
+
+          # Obfuscate Guard qr_script.js
+          javascript-obfuscator qr_script.js --output qr_script.js \
             --compact true \
             --control-flow-flattening true \
             --dead-code-injection true \
