@@ -1,10 +1,11 @@
 {
-    "name": "Smart Entry GECWC",
-    "short_name": "Smart Entry",
+    "name": "Anti-Entropy",
+    "short_name": "AE Pass",
+    "description": "Secure GEC West Champaran entry/exit synchronization system.",
     "start_url": "./index.html",
     "display": "standalone",
-    "background_color": "#f8fafc",
-    "theme_color": "#4f46e5",
+    "background_color": "#F3F2FF",
+    "theme_color": "#D10000",
     "icons": [
         {
             "src": "images/logo-192.png",
