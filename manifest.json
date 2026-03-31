@@ -2,7 +2,7 @@
     "name": "Anti-Entropy",
     "short_name": "AE Pass",
     "description": "Secure GEC West Champaran entry/exit synchronization system.",
-    "start_url": "./index.html",
+    "start_url": "index.html", 
     "display": "standalone",
     "background_color": "#F3F2FF",
     "theme_color": "#D10000",
@@ -10,12 +10,14 @@
         {
             "src": "images/logo-192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         },
         {
             "src": "images/logo-512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ]
 }

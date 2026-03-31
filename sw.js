@@ -1,11 +1,11 @@
 const CACHE_NAME = "gecwc-entry-v3.1";
 const ASSETS_TO_CACHE = [
-  "./",
-  "./index.html",
-  "./style.css",
-  "./script.js",
-  "./images/logo-192.png",
-  "./images/logo-512.png"
+  "index.html",
+  "style.css",
+  "script.js",
+  "manifest.json",
+  "images/logo-192.png",
+  "images/logo-512.png"
 ];
 
 // Install the Service Worker and Cache Assets
