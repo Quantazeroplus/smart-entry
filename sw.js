@@ -1,11 +1,14 @@
-const CACHE_NAME = "gecwc-entry-v3.1";
+const CACHE_NAME = "gecwc-entry-v3";
 const ASSETS_TO_CACHE = [
-  "index.html",
-  "style.css",
-  "script.js",
-  "manifest.json",
-  "images/logo-192.png",
-  "images/logo-512.png"
+  "./",
+  "./index.html",
+  "./style.css",
+  "./script.js",
+  "./manifest.json",
+  "./images/logo-192.png",
+  "./images/logo-512.png",
+  "https://cdn.tailwindcss.com",
+  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
 ];
 
 // Install the Service Worker and Cache Assets

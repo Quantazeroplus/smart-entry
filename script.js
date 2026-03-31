@@ -1,3 +1,5 @@
+
+
 document.addEventListener("contextmenu", (event) =>
   event.preventDefault(),
 );
@@ -326,9 +328,10 @@ document
       };
     };
   });
-const SCRIPT_URL = "__SCRIPT_URL__";
-const QR_COORDS = { lat: __QR_LAT__, lng: __QR_LON__ };
-const MAX_DIST = __MAX_DIST__;
+const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbx8dEgjNnOv525UIynm0WQWHAtcADTZc8gcpTeRwVTknnq0Qgr3u_zvaeM6CUVJzkiY/exec";
+const QR_COORDS = { lat: 26.873095, lng: 84.509599 };
+const MAX_DIST = 500;
 
 const ENTRY_OPTIONS = ["Lecture", "Hostel", "Office", "Other"];
 const EXIT_OPTIONS = ["Chowk", "Bettiah", "Home", "Other"];
@@ -886,19 +889,27 @@ function toggleDarkMode() {
   }
 }
 
-// Initialize on Load
+// Initialize Theme on Load
 window.addEventListener("DOMContentLoaded", () => {
   const themeInput = document.getElementById("themeInput");
+  const savedTheme = localStorage.getItem("theme");
+  const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-  if (localStorage.getItem("theme") === "dark") {
+  // 🚨 FIX: Determine if we should use dark mode
+  // Use saved theme if it exists, otherwise fallback to phone system setting
+  const shouldBeDark = savedTheme === "dark" || (!savedTheme && systemPrefersDark);
+
+  if (shouldBeDark) {
     document.documentElement.classList.add("dark");
-    if (themeInput) themeInput.checked = true; // Ensure Moon loads
+    if (themeInput) themeInput.checked = true; // Show Moon
   } else {
-    if (themeInput) themeInput.checked = false; // Ensure Sun loads
+    document.documentElement.classList.remove("dark");
+    if (themeInput) themeInput.checked = false; // Show Sun
   }
 
   updatePurposeOptions("Entry");
   renderHistory();
+  checkLoginState();
 });
 
 // --- DYNAMIC CARD COLORS ---
@@ -2021,9 +2032,10 @@ function startStatusPolling(roll) {
 }
 
 if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("sw.js")
-        .then(reg => console.log("Service Worker registered!", reg))
-        .catch(err => console.log("Service Worker failed:", err));
-    });
-  }
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("sw.js")
+      .then((reg) => console.log("App ready: Service Worker Registered"))
+      .catch((err) => console.log("Service Worker failed", err));
+  });
+}

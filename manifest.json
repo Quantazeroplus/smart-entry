@@ -4,7 +4,7 @@
     "description": "Secure GEC West Champaran entry/exit synchronization system.",
     "start_url": "index.html", 
     "display": "standalone",
-    "background_color": "#F3F2FF",
+    "background_color": "#a60000",
     "theme_color": "#D10000",
     "icons": [
         {
