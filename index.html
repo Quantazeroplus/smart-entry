@@ -718,8 +718,9 @@
         </div>
 
         <div class="input-group !mb-0">
-          <input type="email" id="regEmail" class="input-field peer text-sm font-medium" placeholder=" " required />
-          <label class="input-label text-sm">College Email</label>
+          <input type="email" id="regEmail" class="input-field peer text-sm font-medium" placeholder=" "
+            pattern="^.+@.+\.com$" title="Email must contain @ and end exactly with .com" required />
+          <label class="input-label text-sm">Email</label>
         </div>
 
         <div class="input-group !mb-0">
@@ -1165,7 +1166,7 @@
         <div class="input-group !mb-0 hidden animate-slide-up" id="confirmPasswordGroup">
           <input type="password" id="updateConfirmPassword"
             class="input-field peer text-sm font-medium transition-colors duration-300" placeholder=" " />
-          <label class="input-label text-sm"><i class="fas fa-check-double mr-2 opacity-70"></i>Confirm Pass..
+          <label class="input-label text-sm"><i class="fas fa-check-double mr-2 opacity-70"></i>Confirm New Password
           </label>
         </div>
 
