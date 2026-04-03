@@ -853,3 +853,23 @@
         rotate: 0;
       }
     }
+
+    .input-error {
+      border-color: #ef4444 !important;
+      background-color: #fef2f2 !important;
+    }
+
+    .dark .input-error {
+      border-color: #ef4444 !important;
+      background-color: rgba(225, 29, 72, 0.1) !important;
+    }
+
+    .input-success {
+      border-color: #10b981 !important;
+      background-color: #ecfdf5 !important;
+    }
+
+    .dark .input-success {
+      border-color: #10b981 !important;
+      background-color: rgba(16, 185, 129, 0.1) !important;
+    }
