@@ -324,40 +324,36 @@ const MAX_DIST = __MAX_DIST__;
 const ENTRY_OPTIONS = ["Lecture", "Hostel", "Office", "Other"];
 const EXIT_OPTIONS = ["Chowk", "Bettiah", "Home", "Other"];
 
-//  DEVICE ID ---
-function getDeviceId() {
-  try {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    canvas.width = 200;
-    canvas.height = 50;
-    ctx.textBaseline = "top";
-    ctx.font = "14px 'Arial'";
-    ctx.fillStyle = "#f60";
-    ctx.fillRect(125, 1, 62, 20);
-    ctx.fillStyle = "#069";
-    ctx.fillText("GECWC-SECURE-ID", 2, 15);
-    ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
-    ctx.fillText("GECWC-SECURE-ID", 4, 17);
 
-    const fingerprint = canvas.toDataURL();
-    const specs = [
-      screen.width + "x" + screen.height,
-      navigator.hardwareConcurrency,
-      navigator.platform,
-      screen.colorDepth,
-    ].join("|");
+let secureDeviceHash = "";
 
-    let hash = 0;
-    const finalStr = fingerprint + specs;
-    for (let i = 0; i < finalStr.length; i++) {
-      hash = (hash << 5) - hash + finalStr.charCodeAt(i);
-      hash |= 0;
-    }
-    return "HW-V3-" + Math.abs(hash).toString(16).toUpperCase();
-  } catch (e) {
-    return "FALLBACK-" + screen.width + "-" + navigator.hardwareConcurrency;
+
+window.addEventListener("DOMContentLoaded", () => {
+  if (window.FingerprintJS) {
+    FingerprintJS.load()
+      .then(fp => fp.get())
+      .then(result => {
+        // result.visitorId is a permanent 32-character string unique to this exact physical phone
+        secureDeviceHash = "SECURE-" + result.visitorId.toUpperCase();
+        console.log("Hardware Locked: ", secureDeviceHash);
+      });
   }
+});
+
+// 2. Return the calculated fingerprint when needed
+function getDeviceId() {
+  // If they somehow click submit before it finishes calculating in the background (very rare), 
+  // fallback to a local storage permanent ID temporarily.
+  if (!secureDeviceHash) {
+    let fallback = localStorage.getItem("gecwc_temp_id");
+    if (!fallback) {
+      fallback = "TEMP-" + Math.random().toString(36).substring(2, 15).toUpperCase();
+      localStorage.setItem("gecwc_temp_id", fallback);
+    }
+    return fallback;
+  }
+
+  return secureDeviceHash;
 }
 
 // --- LOOKUP TRIGGER ---
