@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Aentropy</string>
+    <string name="title_activity_main">Aentropy</string>
+    <string name="package_name">com.aentropy.smartentry</string>
+    <string name="custom_url_scheme">com.aentropy.smartentry</string>
+</resources>
