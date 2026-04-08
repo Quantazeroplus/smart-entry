@@ -1,5 +1,11 @@
 {
   "appId": "com.aentropy.smartentry",
   "appName": "Aentropy",
-  "webDir": "www"
+  "webDir": "www",
+  "plugins": {
+    "StatusBar": {
+      "backgroundColor": "#a60000",
+      "style": "DARK"
+    }
+  }
 }
