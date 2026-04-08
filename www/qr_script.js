@@ -90,7 +90,7 @@ async function verifyGuardPassword() {
     const btn = document.getElementById("guardUnlockBtn");
 
 
-if (pass !== ENV.GUARD_PASS) {
+    if (pass !== "__GUARD_PASS__") {
         showToast("INCORRECT GATE PASSWORD");
         btn.classList.add("animate-shake-error", "border-rose-500");
         setTimeout(

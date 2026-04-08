@@ -33,11 +33,15 @@ jobs:
           echo "  QR_LAT: ${{ secrets.QR_LAT }}," >> www/env.js
           echo "  QR_LON: ${{ secrets.QR_LON }}," >> www/env.js
           echo "  MAX_DIST: ${{ secrets.MAX_DIST }}," >> www/env.js
-          echo "  GUARD_PASS: '${{ secrets.GUARD_PASS }}'" >> www/env.js
+          echo "  BASE_URL: '${{ secrets.BASE_URL }}'" >> www/env.js
           echo "};" >> www/env.js
 
       - name: Install JavaScript Obfuscator
         run: npm install -g javascript-obfuscator
+
+      - name: Inject Guard Password into Script
+        run: |
+          sed -i "s/__GUARD_PASS__/${{ secrets.GUARD_PASS }}/g" www/qr_script.js
 
       - name: Scramble JavaScript in www Folder
         run: |

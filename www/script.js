@@ -628,9 +628,15 @@ document.getElementById("entryForm").addEventListener("submit", async (e) => {
             }
           }
 
-          let basePath = window.location.href.split("?")[0];
-          if (!basePath.endsWith("/"))
-            basePath = basePath.substring(0, basePath.lastIndexOf("/"));
+          let basePath = "";
+          if (window.Capacitor && window.Capacitor.isNative) {
+            // Android App uses the secure secret variable!
+            basePath = ENV.BASE_URL;
+          } else {
+            // Web App stays fully dynamic!
+            basePath = window.location.href.split("?")[0];
+            if (!basePath.endsWith("/")) basePath = basePath.substring(0, basePath.lastIndexOf("/"));
+          }
 
           const timestamp = Date.now();
           const rawQrData =
@@ -713,19 +719,30 @@ document.getElementById("entryForm").addEventListener("submit", async (e) => {
   );
 });
 
-function speakSuccess(name, mode) {
+async function speakSuccess(name, mode) {
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+  const textToSpeak = greeting + " " + name + ". Your " + mode + " has been marked. Thank you!";
+
+  // 1. Android App: Use Native Capacitor Text-to-Speech
+  if (window.Capacitor && window.Capacitor.isNative) {
+    try {
+      await Capacitor.Plugins.TextToSpeech.speak({
+        text: textToSpeak,
+        lang: 'en-US',
+        rate: 1.0,
+        pitch: 1.0,
+        volume: 1.0,
+        category: 'ambient',
+      });
+      return; // Exit so it doesn't trigger the web voice
+    } catch (e) {
+      console.log("Native TTS Failed:", e);
+    }
+  }
+
+  // 2. Web App: Fallback to normal browser speech
   if ("speechSynthesis" in window) {
-    const hour = new Date().getHours();
-    const greeting =
-      hour < 12
-        ? "Good Morning"
-        : hour < 17
-          ? "Good Afternoon"
-          : "Good Evening";
-
-    const textToSpeak =
-      greeting + " " + name + ". Your " + mode + " has been marked. Thank you!";
-
     const message = new SpeechSynthesisUtterance(textToSpeak);
     message.volume = 1;
     message.rate = 0.95;
@@ -1255,11 +1272,17 @@ function reShowSuccess(name, mode, time, date, roll, branch, roomNo, role) {
     }
   }
 
-  // GENERATE QR CODE WEB
-  let basePath = window.location.href.split("?")[0];
-  if (!basePath.endsWith("/"))
-    basePath = basePath.substring(0, basePath.lastIndexOf("/"));
 
+  // GENERATE QR CODE WEB
+  let basePath = "";
+  if (window.Capacitor && window.Capacitor.isNative) {
+    // Android App uses the secure secret variable!
+    basePath = ENV.BASE_URL;
+  } else {
+    // Web App stays fully dynamic!
+    basePath = window.location.href.split("?")[0];
+    if (!basePath.endsWith("/")) basePath = basePath.substring(0, basePath.lastIndexOf("/"));
+  }
   const timestamp = Date.now();
   const rawQrData =
     basePath + "/qr_guard.html?scan=" + roll + "&t=" + timestamp;
