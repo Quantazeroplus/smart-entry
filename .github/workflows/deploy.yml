@@ -25,17 +25,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Create WWW Build Folder & Generate env.js
+      - name: Generate env.js inside existing www folder
         run: |
-          # 1. Create a clean www folder
-          mkdir -p www
-          
-          # 2. Copy all your files into www
-          cp -r index.html style.css script.js manifest.json sw.js images www/
-          if [ -f "qr_script.js" ]; then cp qr_script.js www/; fi
-          if [ -f "qr_guard.html" ]; then cp qr_guard.html www/; fi
-          
-          # 3. Generate env.js directly inside the www folder using GitHub Secrets
+          # Create env.js directly where index.html is
           echo "const ENV = {" > www/env.js
           echo "  SCRIPT_URL: '${{ secrets.SCRIPT_URL }}'," >> www/env.js
           echo "  QR_LAT: ${{ secrets.QR_LAT }}," >> www/env.js
@@ -47,9 +39,9 @@ jobs:
       - name: Install JavaScript Obfuscator
         run: npm install -g javascript-obfuscator
 
-      - name: Scramble JavaScript in WWW Folder
+      - name: Scramble JavaScript in www Folder
         run: |
-          # Obfuscate the scripts INSIDE the www folder, keeping original source safe
+          # Target the scripts inside the www subfolder
           javascript-obfuscator www/script.js --output www/script.js \
             --compact true \
             --control-flow-flattening true \
@@ -74,7 +66,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-         path: './www'
+          # This tells GitHub to host the contents of the www folder
+          path: './www'
 
       - name: Deploy to GitHub Pages
         id: deployment
