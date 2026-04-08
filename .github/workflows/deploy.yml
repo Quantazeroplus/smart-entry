@@ -25,22 +25,32 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Inject Secrets into Scripts
+      - name: Create WWW Build Folder & Generate env.js
         run: |
-          sed -i "s|__SCRIPT_URL__|${{ secrets.SCRIPT_URL }}|g" script.js
-          sed -i "s|__QR_LAT__|${{ secrets.QR_LAT }}|g" script.js
-          sed -i "s|__QR_LON__|${{ secrets.QR_LON }}|g" script.js
-          sed -i "s|__MAX_DIST__|${{ secrets.MAX_DIST }}|g" script.js
-          sed -i "s|__SCRIPT_URL__|${{ secrets.SCRIPT_URL }}|g" qr_script.js
-          sed -i "s|__GUARD_PASS__|${{ secrets.GUARD_PASS }}|g" qr_script.js
+          # 1. Create a clean www folder
+          mkdir -p www
+          
+          # 2. Copy all your files into www
+          cp -r index.html style.css script.js manifest.json sw.js images www/
+          if [ -f "qr_script.js" ]; then cp qr_script.js www/; fi
+          if [ -f "qr_guard.html" ]; then cp qr_guard.html www/; fi
+          
+          # 3. Generate env.js directly inside the www folder using GitHub Secrets
+          echo "const ENV = {" > www/env.js
+          echo "  SCRIPT_URL: '${{ secrets.SCRIPT_URL }}'," >> www/env.js
+          echo "  QR_LAT: ${{ secrets.QR_LAT }}," >> www/env.js
+          echo "  QR_LON: ${{ secrets.QR_LON }}," >> www/env.js
+          echo "  MAX_DIST: ${{ secrets.MAX_DIST }}," >> www/env.js
+          echo "  GUARD_PASS: '${{ secrets.GUARD_PASS }}'" >> www/env.js
+          echo "};" >> www/env.js
 
       - name: Install JavaScript Obfuscator
         run: npm install -g javascript-obfuscator
 
-      - name: Scramble JavaScript
+      - name: Scramble JavaScript in WWW Folder
         run: |
-          # Obfuscate main script.js
-          javascript-obfuscator script.js --output script.js \
+          # Obfuscate the scripts INSIDE the www folder, keeping original source safe
+          javascript-obfuscator www/script.js --output www/script.js \
             --compact true \
             --control-flow-flattening true \
             --dead-code-injection true \
@@ -48,14 +58,15 @@ jobs:
             --string-array-encoding 'base64' \
             --disable-console-output true
 
-          # Obfuscate Guard qr_script.js
-          javascript-obfuscator qr_script.js --output qr_script.js \
-            --compact true \
-            --control-flow-flattening true \
-            --dead-code-injection true \
-            --string-array true \
-            --string-array-encoding 'base64' \
-            --disable-console-output true
+          if [ -f "www/qr_script.js" ]; then
+            javascript-obfuscator www/qr_script.js --output www/qr_script.js \
+              --compact true \
+              --control-flow-flattening true \
+              --dead-code-injection true \
+              --string-array true \
+              --string-array-encoding 'base64' \
+              --disable-console-output true
+          fi
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v4

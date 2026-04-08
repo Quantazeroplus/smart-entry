@@ -1,4 +1,6 @@
-const CACHE_NAME = "gecwc-entry-v8";
+// 1. Change the version from v8 to v9 to force user phones to update!
+const CACHE_NAME = "gecwc-entry-v9";
+
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -7,10 +9,15 @@ const ASSETS_TO_CACHE = [
   "./manifest.json",
   "./images/logo-192.png",
   "./images/logo-512.png",
+  
+  "./env.js",             
+  "./qr_guard.html",      
+  "./qr_script.js",       
+  "./qr_style.css",       
+
   "https://cdn.tailwindcss.com",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
 ];
-
 // Install the Service Worker and Cache Assets
 self.addEventListener("install", (event) => {
   event.waitUntil(

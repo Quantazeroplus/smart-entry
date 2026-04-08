@@ -20,7 +20,10 @@
   "homepage": "https://github.com/Quantazeroplus/smart-entry#readme",
   "dependencies": {
     "@capacitor/android": "^8.3.0",
+    "@capacitor/camera": "^8.0.2",
     "@capacitor/cli": "^8.3.0",
-    "@capacitor/core": "^8.3.0"
+    "@capacitor/core": "^8.3.0",
+    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/geolocation": "^8.2.0"
   }
 }

@@ -316,10 +316,9 @@ document
     };
   });
 
-const SCRIPT_URL = "__SCRIPT_URL__";
-const QR_COORDS = { lat: __QR_LAT__, lng: __QR_LON__ };
-const MAX_DIST = __MAX_DIST__;
-
+const SCRIPT_URL = ENV.SCRIPT_URL;
+const QR_COORDS = { lat: ENV.QR_LAT, lng: ENV.QR_LON };
+const MAX_DIST = ENV.MAX_DIST;
 
 const ENTRY_OPTIONS = ["Lecture", "Hostel", "Office", "Other"];
 const EXIT_OPTIONS = ["Chowk", "Bettiah", "Home", "Other"];

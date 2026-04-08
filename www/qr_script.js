@@ -12,9 +12,7 @@ document.onkeydown = function (e) {
         return false;
 };
 
-const SCRIPT_URL =
-    "__SCRIPT_URL__";
-
+const SCRIPT_URL = ENV.SCRIPT_URL;
 let scannedRoll = null;
 
 // Theme Toggle Logic
@@ -92,7 +90,7 @@ async function verifyGuardPassword() {
     const btn = document.getElementById("guardUnlockBtn");
 
 
-    if (pass !== "__GUARD_PASS__") {
+if (pass !== ENV.GUARD_PASS) {
         showToast("INCORRECT GATE PASSWORD");
         btn.classList.add("animate-shake-error", "border-rose-500");
         setTimeout(
