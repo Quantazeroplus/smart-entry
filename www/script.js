@@ -487,7 +487,12 @@ function toggleQuickEntry(checkbox) {
 // --- SUBMISSION ---
 document.getElementById("entryForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-
+if ("speechSynthesis" in window) {
+    const silentUtterance = new SpeechSynthesisUtterance("");
+    silentUtterance.volume = 0;
+    window.speechSynthesis.speak(silentUtterance);
+  }
+  
   //FINAL SECURITY GATE
   const currentRole = document.getElementById("userRole").value;
   if (currentRole === "Student") {
@@ -739,7 +744,7 @@ async function speakSuccess(name, mode) {
           volume: 1.0,
           category: 'ambient',
         });
-        nativeWorked = true;
+        nativeWorked = true; 
       }
     } catch (e) {
       console.log("Native TTS failed, moving to fallback:", e);
@@ -1791,15 +1796,13 @@ function toggleMenu() {
     overlay.classList.add("opacity-0", "pointer-events-none");
   }
 }
-
 // --- GOOGLE DRIVE IMAGE CONVERTER ---
 function getDirectDriveLink(url) {
   if (!url) return "";
   // Extracts the 33-character Google Drive File ID
   const match = url.match(/[-\w]{25,}/);
   if (match && match[0]) {
-    // This 'uc?export=view' endpoint is much more reliable for Android WebViews!
-    return "https://drive.google.com/uc?export=view&id=" + match[0];
+    return "https://drive.google.com/thumbnail?id=" + match[0] + "&sz=w400";
   }
   return url;
 }
