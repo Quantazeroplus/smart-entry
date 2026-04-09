@@ -759,8 +759,7 @@ async function speakSuccess(name, mode) {
       message.rate = 0.95;
       message.pitch = 1.1;
 
-      // 🔥 THE BUG FIX: Android WebViews often return an empty array here.
-      // If it's empty, we DO NOT force a voice. We just let the phone use its default!
+
       const voices = window.speechSynthesis.getVoices();
       if (voices && voices.length > 0) {
         const femaleVoice = voices.find((v) => v.name.includes("Female"));
