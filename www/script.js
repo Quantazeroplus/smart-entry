@@ -730,7 +730,6 @@ async function speakSuccess(name, mode) {
   // 1. Try Native Android Text-to-Speech
   if (window.Capacitor && window.Capacitor.isNative) {
     try {
-      // Check if the plugin is actually loaded before calling it
       if (window.Capacitor.Plugins && window.Capacitor.Plugins.TextToSpeech) {
         await window.Capacitor.Plugins.TextToSpeech.speak({
           text: textToSpeak,
@@ -740,14 +739,14 @@ async function speakSuccess(name, mode) {
           volume: 1.0,
           category: 'ambient',
         });
-        nativeWorked = true; // Mark as success!
+        nativeWorked = true;
       }
     } catch (e) {
       console.log("Native TTS failed, moving to fallback:", e);
     }
   }
 
-  // 2. Bulletproof Fallback: If Native failed, force the Web Speech API
+  // 2. Bulletproof Fallback: The Web Speech API
   if (!nativeWorked && "speechSynthesis" in window) {
     try {
       const message = new SpeechSynthesisUtterance(textToSpeak);
@@ -755,8 +754,16 @@ async function speakSuccess(name, mode) {
       message.rate = 0.95;
       message.pitch = 1.1;
 
+      // 🔥 THE BUG FIX: Android WebViews often return an empty array here.
+      // If it's empty, we DO NOT force a voice. We just let the phone use its default!
       const voices = window.speechSynthesis.getVoices();
-      message.voice = voices.find((v) => v.name.includes("Female")) || voices[0];
+      if (voices && voices.length > 0) {
+        const femaleVoice = voices.find((v) => v.name.includes("Female"));
+        if (femaleVoice) {
+          message.voice = femaleVoice;
+        }
+      }
+
       window.speechSynthesis.speak(message);
     } catch (e) {
       console.log("Web TTS failed:", e);
@@ -1784,13 +1791,15 @@ function toggleMenu() {
     overlay.classList.add("opacity-0", "pointer-events-none");
   }
 }
+
 // --- GOOGLE DRIVE IMAGE CONVERTER ---
 function getDirectDriveLink(url) {
   if (!url) return "";
   // Extracts the 33-character Google Drive File ID
   const match = url.match(/[-\w]{25,}/);
   if (match && match[0]) {
-    return "https://drive.google.com/thumbnail?id=" + match[0] + "&sz=w400";
+    // This 'uc?export=view' endpoint is much more reliable for Android WebViews!
+    return "https://drive.google.com/uc?export=view&id=" + match[0];
   }
   return url;
 }

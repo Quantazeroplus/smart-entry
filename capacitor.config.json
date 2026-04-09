@@ -1,11 +1,13 @@
 {
-  "appId": "com.aentropy.smartentry",
-  "appName": "Aentropy",
+  "appId": "com.your.app",
+  "appName": "Smart Entry",
   "webDir": "www",
+  "bundledWebRuntime": false,
   "plugins": {
     "StatusBar": {
-      "backgroundColor": "#a60000",
-      "style": "DARK"
+      "overlaysWebView": false,
+      "style": "DARK",
+      "backgroundColor": "#A60000"
     }
   }
 }
