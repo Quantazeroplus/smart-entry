@@ -628,14 +628,15 @@ document.getElementById("entryForm").addEventListener("submit", async (e) => {
             }
           }
 
-          let basePath = "";
-          if (window.Capacitor && window.Capacitor.isNative) {
-            // Android App uses the secure secret variable!
-            basePath = ENV.BASE_URL;
-          } else {
-            // Web App stays fully dynamic!
-            basePath = window.location.href.split("?")[0];
-            if (!basePath.endsWith("/")) basePath = basePath.substring(0, basePath.lastIndexOf("/"));
+
+          let basePath = window.location.href.split("?")[0];
+          if (!basePath.endsWith("/")) basePath = basePath.substring(0, basePath.lastIndexOf("/"));
+
+          // 2. BULLETPROOF INTERCEPTION: If the Android WebView tries to use localhost, forcefully overwrite it!
+          if (basePath.includes("localhost")) {
+            basePath = (typeof ENV !== 'undefined' && ENV.BASE_URL)
+              ? ENV.BASE_URL
+              : "https://quantazeroplus.github.io/smart-entry";
           }
 
           const timestamp = Date.now();
@@ -724,33 +725,42 @@ async function speakSuccess(name, mode) {
   const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
   const textToSpeak = greeting + " " + name + ". Your " + mode + " has been marked. Thank you!";
 
-  // 1. Android App: Use Native Capacitor Text-to-Speech
+  let nativeWorked = false;
+
+  // 1. Try Native Android Text-to-Speech
   if (window.Capacitor && window.Capacitor.isNative) {
     try {
-      await window.Capacitor.Plugins.TextToSpeech.speak({
-        text: textToSpeak,
-        lang: 'en-US',
-        rate: 1.0,
-        pitch: 1.0,
-        volume: 1.0,
-        category: 'ambient',
-      });
-      return; // Exit so it doesn't trigger the web voice
+      // Check if the plugin is actually loaded before calling it
+      if (window.Capacitor.Plugins && window.Capacitor.Plugins.TextToSpeech) {
+        await window.Capacitor.Plugins.TextToSpeech.speak({
+          text: textToSpeak,
+          lang: 'en-US',
+          rate: 1.0,
+          pitch: 1.0,
+          volume: 1.0,
+          category: 'ambient',
+        });
+        nativeWorked = true; // Mark as success!
+      }
     } catch (e) {
-      console.log("Native TTS Failed:", e);
+      console.log("Native TTS failed, moving to fallback:", e);
     }
   }
 
-  // 2. Web App: Fallback to normal browser speech
-  if ("speechSynthesis" in window) {
-    const message = new SpeechSynthesisUtterance(textToSpeak);
-    message.volume = 1;
-    message.rate = 0.95;
-    message.pitch = 1.1;
+  // 2. Bulletproof Fallback: If Native failed, force the Web Speech API
+  if (!nativeWorked && "speechSynthesis" in window) {
+    try {
+      const message = new SpeechSynthesisUtterance(textToSpeak);
+      message.volume = 1;
+      message.rate = 0.95;
+      message.pitch = 1.1;
 
-    const voices = window.speechSynthesis.getVoices();
-    message.voice = voices.find((v) => v.name.includes("Female")) || voices[0];
-    window.speechSynthesis.speak(message);
+      const voices = window.speechSynthesis.getVoices();
+      message.voice = voices.find((v) => v.name.includes("Female")) || voices[0];
+      window.speechSynthesis.speak(message);
+    } catch (e) {
+      console.log("Web TTS failed:", e);
+    }
   }
 }
 
@@ -1278,15 +1288,17 @@ function reShowSuccess(name, mode, time, date, roll, branch, roomNo, role) {
 
 
   // GENERATE QR CODE WEB
-  let basePath = "";
-  if (window.Capacitor && window.Capacitor.isNative) {
-    // Android App uses the secure secret variable!
-    basePath = ENV.BASE_URL;
-  } else {
-    // Web App stays fully dynamic!
-    basePath = window.location.href.split("?")[0];
-    if (!basePath.endsWith("/")) basePath = basePath.substring(0, basePath.lastIndexOf("/"));
+
+  let basePath = window.location.href.split("?")[0];
+  if (!basePath.endsWith("/")) basePath = basePath.substring(0, basePath.lastIndexOf("/"));
+
+  // 2. BULLETPROOF INTERCEPTION: If the Android WebView tries to use localhost, forcefully overwrite it!
+  if (basePath.includes("localhost")) {
+    basePath = (typeof ENV !== 'undefined' && ENV.BASE_URL)
+      ? ENV.BASE_URL
+      : "https://quantazeroplus.github.io/smart-entry";
   }
+
   const timestamp = Date.now();
   const rawQrData =
     basePath + "/qr_guard.html?scan=" + roll + "&t=" + timestamp;
