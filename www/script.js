@@ -727,7 +727,7 @@ async function speakSuccess(name, mode) {
   // 1. Android App: Use Native Capacitor Text-to-Speech
   if (window.Capacitor && window.Capacitor.isNative) {
     try {
-      await Capacitor.Plugins.TextToSpeech.speak({
+      await window.Capacitor.Plugins.TextToSpeech.speak({
         text: textToSpeak,
         lang: 'en-US',
         rate: 1.0,
@@ -890,7 +890,6 @@ window.addEventListener("DOMContentLoaded", () => {
   ).matches;
 
   // 🚨 FIX: Determine if we should use dark mode
-  // Use saved theme if it exists, otherwise fallback to phone system setting
   const shouldBeDark =
     savedTheme === "dark" || (!savedTheme && systemPrefersDark);
 
@@ -900,6 +899,11 @@ window.addEventListener("DOMContentLoaded", () => {
   } else {
     document.documentElement.classList.remove("dark");
     if (themeInput) themeInput.checked = false; // Show Sun
+  }
+
+  // 🎨 FORCE THE ANDROID STATUS BAR COLOR TO RED
+  if (window.Capacitor && window.Capacitor.Plugins.StatusBar) {
+    window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: '#A60000' }).catch(e => console.log(e));
   }
 
   updatePurposeOptions("Entry");

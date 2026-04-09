@@ -4,16 +4,17 @@ const CACHE_NAME = "gecwc-entry-v9";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
+  "./privacy.html",
   "./style.css",
   "./script.js",
   "./manifest.json",
   "./images/logo-192.png",
   "./images/logo-512.png",
-  
-  "./env.js",             
-  "./qr_guard.html",      
-  "./qr_script.js",       
-  "./qr_style.css",       
+
+  "./env.js",
+  "./qr_guard.html",
+  "./qr_script.js",
+  "./qr_style.css",
 
   "https://cdn.tailwindcss.com",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
