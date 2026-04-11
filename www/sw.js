@@ -1,5 +1,5 @@
-// 1. Change the version from v8 to v9 to force user phones to update!
-const CACHE_NAME = "gecwc-entry-v9";
+
+const CACHE_NAME = "gecwc-entry-v10";
 
 const ASSETS_TO_CACHE = [
   "./",

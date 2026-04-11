@@ -1,6 +1,6 @@
 {
-  "appId": "com.your.app",
-  "appName": "Smart Entry",
+  "appId": "com.aentropy.smartentry",
+  "appName": "Aentropy",
   "webDir": "www",
   "bundledWebRuntime": false,
   "plugins": {
