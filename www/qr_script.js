@@ -106,11 +106,17 @@ async function verifyGuardPassword() {
     btn.disabled = true;
 
     try {
+        // 🔥 FIX 1: Convert 10-digit Guest IDs to Numbers
+        let lookupRoll = scannedRoll;
+        if (/^\d{10}$/.test(lookupRoll)) {
+            lookupRoll = Number(lookupRoll);
+        }
+
         const res = await fetch(SCRIPT_URL, {
             method: "POST",
             body: JSON.stringify({
                 action: "guard_lookup",
-                roll: scannedRoll,
+                roll: lookupRoll,
                 deviceId: getDeviceId(),
             }),
         });
@@ -273,20 +279,29 @@ async function verifyGuardPassword() {
         btn.disabled = false;
     }
 }
+
 async function approveGuestRecord() {
     const btn = document.getElementById("guardApproveBtn");
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> APPROVING...';
     btn.disabled = true;
 
+
     try {
+        // 🔥 FIX 2: Convert to Number for final approval
+        let approveRoll = scannedRoll;
+        if (/^\d{10}$/.test(approveRoll)) {
+            approveRoll = Number(approveRoll);
+        }
+
         const res = await fetch(SCRIPT_URL, {
             method: "POST",
             body: JSON.stringify({
                 action: "approve_guest",
-                roll: scannedRoll,
+                roll: approveRoll, // <-- USE THE CONVERTED VARIABLE HERE
             }),
         });
         const result = await res.json();
+
         if (result.success) {
             btn.innerHTML = '<i class="fas fa-check"></i> APPROVED';
             btn.classList.replace("from-amber-500", "from-emerald-500");
