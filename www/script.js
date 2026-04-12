@@ -487,12 +487,12 @@ function toggleQuickEntry(checkbox) {
 // --- SUBMISSION ---
 document.getElementById("entryForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-if ("speechSynthesis" in window) {
+  if ("speechSynthesis" in window) {
     const silentUtterance = new SpeechSynthesisUtterance("");
     silentUtterance.volume = 0;
     window.speechSynthesis.speak(silentUtterance);
   }
-  
+
   //FINAL SECURITY GATE
   const currentRole = document.getElementById("userRole").value;
   if (currentRole === "Student") {
@@ -744,7 +744,7 @@ async function speakSuccess(name, mode) {
           volume: 1.0,
           category: 'ambient',
         });
-        nativeWorked = true; 
+        nativeWorked = true;
       }
     } catch (e) {
       console.log("Native TTS failed, moving to fallback:", e);
@@ -818,16 +818,10 @@ L.circle([QR_COORDS.lat, QR_COORDS.lng], {
 
 let userMarker;
 let isInZone = false;
+let currentGpsState = "red"; // 🚨 ADDED THIS to track the current color
+
 navigator.geolocation.watchPosition(
   (pos) => {
-    const gpsDot = document.getElementById("gps-dot");
-    const gpsPing = document.getElementById("gps-ping");
-    if (gpsDot && gpsPing) {
-      gpsDot.className = "relative w-2.5 h-2.5 rounded-full bg-gateGreen";
-      gpsPing.className =
-        "absolute w-3 h-3 rounded-full bg-gateGreen animate-ping opacity-75";
-    }
-
     const lat = pos.coords.latitude,
       lon = pos.coords.longitude;
     window.userPos = pos.coords;
@@ -850,27 +844,47 @@ navigator.geolocation.watchPosition(
       `${Math.max(0, 100 - dist * 4)}%`;
 
     const isAllowed = dist <= MAX_DIST;
-    if (dist <= MAX_DIST && !isInZone) {
+
+    // --- YOUR 3-STATE UI LOGIC ---
+    const gpsDot = document.getElementById("gps-dot");
+    const gpsPing = document.getElementById("gps-ping");
+
+    if (gpsDot && gpsPing) {
+      if (isAllowed) {
+        currentGpsState = "green"; // Track Green
+        // GREEN DOT (At the gate, form opens)
+        gpsDot.className = "relative w-2.5 h-2.5 rounded-full bg-emerald-500 z-10 shadow-[0_0_8px_rgba(16,185,129,0.9)] transition-all duration-300";
+        gpsPing.className = "absolute w-3 h-3 rounded-full bg-emerald-400 animate-ping opacity-75 transition-all duration-300";
+      } else {
+        currentGpsState = "orange"; // Track Orange
+        // ORANGE DOT (GPS found, but too far away) - Made big!
+        gpsDot.className = "relative w-2.5 h-2.5 rounded-full bg-orange-500 z-10 shadow-[0_0_8px_rgba(249,115,22,0.9)] transition-all duration-300";
+        gpsPing.className = "absolute w-3 h-3 rounded-full bg-orange-400 animate-ping opacity-75 transition-all duration-300";
+      }
+    }
+
+    if (isAllowed && !isInZone) {
       isInZone = true; // Mark as inside
       if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]); // Vibrate ONCE
     } else if (dist > MAX_DIST + 5) {
       isInZone = false;
     }
-    document.getElementById("lockMessage").style.display = isAllowed
-      ? "none"
-      : "block";
+
+    document.getElementById("lockMessage").style.display = isAllowed ? "none" : "block";
     document.getElementById("entryForm").classList.toggle("hidden", !isAllowed);
   },
   (err) => {
+    currentGpsState = "red"; // Track Red
+    // RED DOT (GPS Off, Failed, or Timed Out) - Made big!
     const gpsDot = document.getElementById("gps-dot");
     const gpsPing = document.getElementById("gps-ping");
     if (gpsDot && gpsPing) {
-      gpsDot.className = "relative w-2.5 h-2.5 rounded-full bg-gateRed";
-      gpsPing.className =
-        "absolute w-3 h-3 rounded-full bg-gateRed animate-ping opacity-75";
+      gpsDot.className = "relative w-2.5 h-2.5 rounded-full bg-rose-500 z-10 shadow-[0_0_8px_rgba(244,63,94,0.9)] transition-all duration-300";
+      gpsPing.className = "absolute w-3 h-3 rounded-full bg-rose-400 animate-ping opacity-75 transition-all duration-300";
     }
   },
-  { enableHighAccuracy: true },
+  // 5-second timeout forces Android to trigger the Red Dot if GPS is off
+  { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
 );
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -2296,16 +2310,27 @@ document
     const confirmInput = document.getElementById("updateConfirmPassword");
 
     if (e.target.value.length > 0) {
-      // If they type a password, show the confirm box and make it required
+
       confirmGroup.classList.remove("hidden");
       confirmInput.required = true;
     } else {
-      // If they delete the password, hide the confirm box and clear its data
+
       confirmGroup.classList.add("hidden");
       confirmInput.required = false;
       confirmInput.value = "";
     }
 
-    // Still run the red/green color check
     validateMatch("updatePassword", "updateConfirmPassword");
   });
+
+
+// --- SHOW GPS STATUS ON CLICK ---
+function checkGpsStatus() {
+  if (currentGpsState === "red") {
+    showAlert("Location Error", "We are searching for a signal. Please ensure your phone's GPS/Location is turned ON.", "error");
+  } else if (currentGpsState === "orange") {
+    showAlert("Out of Range", "Location found, but you are not near the gate. Please move closer to the entrance to unlock the form.", "warning");
+  } else if (currentGpsState === "green") {
+    showAlert("Location Verified", "You are in the authorized gate zone! You may proceed with your entry/exit.", "success");
+  }
+}
